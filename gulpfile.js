@@ -18,8 +18,8 @@ gulp.task('js', function () {
             'polyfill.js',
             'functions.js'
         ]))
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'))
+        //.pipe(jshint())
+        //.pipe(jshint.reporter('default'))
         .pipe(sourcemaps.init())
         .pipe(uglify())
         .pipe(concat('compiled.js'))

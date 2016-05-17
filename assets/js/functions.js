@@ -39,7 +39,7 @@ ExcelJS.Table.prototype.addColumn = function () {
             cols        = this.cols+parseInt(1),
             rowKey      = 0,
             newColHead  = document.createElement('th'),
-            colHead     = document.createElement('span');
+            colHead     = document.createElement('span'),
             newColFoot  = document.createElement('td'),
             colFoot     = document.createElement('a');
 
@@ -95,11 +95,11 @@ ExcelJS.Table.prototype.addColumn = function () {
         this.cols++;
     }
 
-    if(typeof cols !== 'undefined'){
+    if(typeof this.cols !== 'undefined'){
         //Add event listener to delete column link.
-        var deleteCol = document.getElementsByClassName("deleteCol-"+cols);
+        var deleteCol = document.getElementsByClassName("deleteCol-"+this.cols);
         deleteCol[0].addEventListener("click", function() {
-            _self.deleteColumn(this.getAttribute("data-col-id"))
+            _self.deleteColumn(this.getAttribute("data-col-id"));
             _self.cols--;
         }, false);
     }
@@ -152,7 +152,7 @@ ExcelJS.Table.prototype.addRow = function () {
         //Add eventlistener to delete column link.
         var deleteCol = document.getElementsByClassName("deleteCol-"+this.cols);
         deleteCol[0].addEventListener("click", function() {
-            _self.deleteColumn(this.getAttribute("data-col-id"))
+            _self.deleteColumn(this.getAttribute("data-col-id"));
             _self.cols--;
         }, false);
     }
@@ -186,10 +186,10 @@ ExcelJS.Table.prototype.addRow = function () {
     this.tbody.appendChild(newRow);
 
     //Now fields have been added, add event listener for changing readonly on click/blur.
-    var counter = 0;
-    while(counter <= this.cols)
+    var listenerCounter = 0;
+    while(listenerCounter <= this.cols)
     {
-        var field = document.getElementsByClassName("col_"+this.rows+"_"+counter);
+        var field = document.getElementsByClassName("col_"+this.rows+"_"+listenerCounter);
         field[0].addEventListener("click", function() {
             this.readOnly   = false;
         }, false);
@@ -197,12 +197,12 @@ ExcelJS.Table.prototype.addRow = function () {
             this.readOnly   = true;
         }, false);
 
-        counter++;
+        listenerCounter++;
     }
 
     //Add eventlistener to delete row button.
-    var deleteRow = document.getElementsByClassName("deleteRow");
-    deleteRow[this.rows].addEventListener("click", function() {
+    var deleteRowButton = document.getElementsByClassName("deleteRow");
+    deleteRowButton[this.rows].addEventListener("click", function() {
         var rowKey = this.getAttribute('data-row-id');
         _self.deleteRow(rowKey);
     }, false);
@@ -324,6 +324,11 @@ ExcelJS.Table.prototype.sortColumn = function (columnKey, sort) {
 
     //Since tbody has been replaced, we need to reset this.tbody.
     this.tbody = this.exceljs.childNodes[1];
+
+    //Known issue sorting numerical characters with different lengths
+    function correctSort(a,b) {
+        return a - b;
+    }
 };
 
 /**
@@ -382,16 +387,16 @@ ExcelJS.Table.prototype.resetKeys = function () {
     });
 
     //Update tfoot cell keys.
-    var row     = this.tfoot,
-        cols    = row.childNodes,
-        colKey  = 0;
+    var footRow     = this.tfoot,
+        footCols    = footRow.childNodes,
+        footColKey  = 0;
 
-    cols.forEach(function(col){
-        col.className   = "col-"+colKey;
-        col.childNodes[0].innerHTML = "Delete Col";
-        col.childNodes[0].className = "col-"+colKey+" deleteCol deleteCol-"+colKey;
-        col.childNodes[0].setAttribute("data-col-id", colKey);
-        colKey++;
+    footCols.forEach(function(footCol){
+        footCol.className   = "col-"+colKey;
+        footCol.childNodes[0].innerHTML = "Delete Col";
+        footCol.childNodes[0].className = "col-"+footColKey+" deleteCol deleteCol-"+footColKey;
+        footCol.childNodes[0].setAttribute("data-col-id", footColKey);
+        footColKey++;
     });
 
     //Since elements have been changed, we need to reset this.tbody.
